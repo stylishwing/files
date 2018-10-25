@@ -1,88 +1,108 @@
 <!DOCTYPE html>
 <html>
-    <body>
-    <div id="info">hw2
+<head>
+<style>
+#info {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  color: #ffff00
+}
+
+body {
+  overflow: hidden;
+}
+
+</style>
+</head>
+<body>
+
+<<div id="info">hw2 helper
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/84/three.min.js"></script>
 <script src="https://threejs.org/examples/js/controls/OrbitControls.js">
 
 
-
+</script>
 <script src="https://jyunming-chen.github.io/tutsplus/js/KeyboardState.js"></script>
 
-class Ball {
-  constructor(mesh, rad = 2, color) {
+<script>
 
-    this.pos = new THREE.Vector3()
+class Ball {
+	constructor (mesh, rad = 2, color) {
+  
+  	this.pos = new THREE.Vector3()
     this.vel = new THREE.Vector3()
     this.force = new THREE.Vector3()
     this.mesh = mesh;
     this.radius = rad;
-    this.light = new THREE.PointLight(color, 1, 50);
-    scene.add(this.light)
-    scene.add(this.mesh) // add to scene when particle is created
+    this.light = new THREE.PointLight (color, 1, 50);
+    scene.add (this.light)
+    scene.add (this.mesh)   // add to scene when particle is created
 
-    console.log(color)
-    this.mesh.material.color.copy(color.clone());
+console.log (color)
+		this.mesh.material.color.copy ( color.clone() );
   }
-  update(dt) {
-    this.vel.add(this.force.clone().multiplyScalar(dt))
-    this.pos.add(this.vel.clone().multiplyScalar(dt))
-
-    this.collidingPlanes(planes)
-
+  update (dt) {
+		this.vel.add (this.force.clone().multiplyScalar (dt))
+  	this.pos.add (this.vel.clone().multiplyScalar(dt))
+    
+		this.collidingPlanes (planes)
+    
     // simple collision
-    /*
-    if (this.pos.z > 100 - this.radius) {
-      	const CR = 0.9
-      	this.pos.z = 100 - this.radius
-        this.vel.z = - CR * this.vel.z;
-      }
-    */
-    this.mesh.position.copy(this.pos)
-    this.light.position.copy(this.pos)
+  /*
+  if (this.pos.z > 100 - this.radius) {
+    	const CR = 0.9
+    	this.pos.z = 100 - this.radius
+      this.vel.z = - CR * this.vel.z;
+    }
+  */  
+		this.mesh.position.copy (this.pos)
+    this.light.position.copy (this.pos)
     this.light.position.y += 20
   }
 
-  collidingPlanes(planes) {
+	collidingPlanes (planes) {
     const EPS = 1e-3
     const CR = 0.96
-    for (let i = 0; i < planes.length; i++) {
-      let plane = planes[i]
-      let point = this.pos.clone().sub(plane.ptOnPl)
-      if (point.dot(plane.normal) < EPS + this.radius) {
-        // position correction
-        this.pos.copy(plane.ptOnPl.clone().add(point.projectOnPlane(plane.normal)))
-        this.pos.add(plane.normal.clone().multiplyScalar(this.radius))
-        // velocity update
-        this.vel.sub(plane.normal.clone().multiplyScalar((1 + CR) * this.vel.dot(plane.normal)))
-        //return;  // assume particle collides with AT MOST one plane
+  	for (let i = 0; i < planes.length; i++) {
+			let plane = planes[i]
+			let point = this.pos.clone().sub (plane.ptOnPl)
+      if ( point.dot(plane.normal) < EPS + this.radius) {
+				// position correction
+      	this.pos.copy (plane.ptOnPl.clone().add (point.projectOnPlane(plane.normal)) )
+        this.pos.add (plane.normal.clone().multiplyScalar(this.radius))
+      	// velocity update
+      	this.vel.sub (plane.normal.clone().multiplyScalar ((1+CR)*this.vel.dot(plane.normal)))
+      	//return;  // assume particle collides with AT MOST one plane
       }
-    }
+  	}
   }
 
 }
 
 
 class Plane {
-  constructor(localPointOnPlane, localNormal, mesh) {
+	constructor (localPointOnPlane, localNormal, mesh) {
     this.localPtOnPl = localPointOnPlane.clone();
-    this.localNormal = localNormal.clone();
-    this.mesh = mesh; // the graphics representation
-    scene.add(mesh)
+		this.localNormal = localNormal.clone();
+    this.mesh = mesh;  // the graphics representation
+    scene.add (mesh)
   }
-  update() {
-    this.mesh.updateMatrixWorld() // important!
-    this.ptOnPl = this.mesh.localToWorld(this.localPtOnPl.clone());
-    let normalMat = new THREE.Matrix3().getNormalMatrix(this.mesh.matrixWorld);
-    this.normal = this.localNormal.clone().applyMatrix3(normalMat).normalize()
+  update () {
+  	this.mesh.updateMatrixWorld() // important!
+  	this.ptOnPl = this.mesh.localToWorld (this.localPtOnPl.clone());
+    let normalMat = new THREE.Matrix3().getNormalMatrix (this.mesh.matrixWorld);  
+    this.normal = this.localNormal.clone().applyMatrix3 (normalMat).normalize()
   }
 }
 
 ///////////////////////////////////////////////////////////////////////
 var camera, scene, renderer, light;
 var ball
-var planes = []
+var planes =[]
 var balls = []
 
 init();
@@ -93,7 +113,7 @@ function init() {
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
   camera.position.y = 200;
-  camera.position.z = 300;
+	camera.position.z = 300;
 
   light = new THREE.PointLight(0xffffff);
   light.position.set(100, 300, 200);
@@ -101,11 +121,9 @@ function init() {
 
   var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
   //scene.add(gridXZ);
-  var floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshPhongMaterial({
-    color: 0xffffff
-  }))
-  floor.rotation.x = -Math.PI / 2
-  scene.add(floor)
+  var floor = new THREE.Mesh (new THREE.PlaneGeometry (200,200), new THREE.MeshPhongMaterial({color:0xffffff}))
+  floor.rotation.x = -Math.PI/2
+  scene.add (floor)
 
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -115,79 +133,77 @@ function init() {
 
   document.body.appendChild(renderer.domElement);
   ///////////////////////////////////////////////////////////
-
+  
   let disk, ball;
-  disk = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 6, 32), new THREE.MeshBasicMaterial())
-  ball = new Ball(disk, 10, new THREE.Color(0x00ffff))
-  ball.vel.set(60, 0, 15)
-  ball.pos.set(0, 3, 0)
-  balls.push(ball)
+  disk = new THREE.Mesh (new THREE.CylinderGeometry (10, 10, 6, 32), new THREE.MeshBasicMaterial() )
+	ball = new Ball (disk, 10, new THREE.Color (0x00ffff))
+  ball.vel.set (60,0,15)
+  ball.pos.set (0,3,0)
+	balls.push (ball)
+  
+  disk = new THREE.Mesh (new THREE.CylinderGeometry (10, 10, 6, 32), new THREE.MeshBasicMaterial() )
+	ball = new Ball (disk, 10, new THREE.Color (0xff00ff))
+  ball.vel.set (30,0,-15)
+  ball.pos.set (20,3,0)
+	balls.push (ball)
+  
+  disk = new THREE.Mesh (new THREE.CylinderGeometry (10, 10, 6, 32), new THREE.MeshBasicMaterial() )
+	ball = new Ball (disk, 10, new THREE.Color (0xfe23a1))
+  ball.vel.set (0,0,-80)
+  ball.pos.set (70,3,0)
+	balls.push (ball)
+  
+  disk = new THREE.Mesh (new THREE.CylinderGeometry (10, 10, 6, 32), new THREE.MeshBasicMaterial() )
+	ball = new Ball (disk, 10, new THREE.Color (0x582f4a))
+  ball.vel.set (30,0,30)
+  ball.pos.set (45,3,0)
+	balls.push (ball)
+  
+  disk = new THREE.Mesh (new THREE.CylinderGeometry (1, 10, 6, 32), new THREE.MeshBasicMaterial() )
+	ball = new Ball (disk, 10, new THREE.Color (0xFFFF00))
+  ball.vel.set (87,0,40)
+  ball.pos.set (6,3,0)
+	balls.push (ball)
+  
 
-  disk = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 6, 32), new THREE.MeshBasicMaterial())
-  ball = new Ball(disk, 10, new THREE.Color(0xff00ff))
-  ball.vel.set(30, 0, -15)
-  ball.pos.set(20, 3, 0)
-  balls.push(ball)
-
-  disk = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 6, 32), new THREE.MeshBasicMaterial())
-  ball = new Ball(disk, 10, new THREE.Color(0xfe23a1))
-  ball.vel.set(0, 0, -80)
-  ball.pos.set(70, 3, 0)
-  balls.push(ball)
-
-  disk = new THREE.Mesh(new THREE.CylinderGeometry(10, 10, 6, 32), new THREE.MeshBasicMaterial())
-  ball = new Ball(disk, 10, new THREE.Color(0x582f4a))
-  ball.vel.set(30, 0, 30)
-  ball.pos.set(45, 3, 0)
-  balls.push(ball)
-
-  disk = new THREE.Mesh(new THREE.CylinderGeometry(1, 10, 6, 32), new THREE.MeshBasicMaterial())
-  ball = new Ball(disk, 10, new THREE.Color(0xFFFF00))
-  ball.vel.set(87, 0, 40)
-  ball.pos.set(6, 3, 0)
-  balls.push(ball)
-
-
-  let plane, wall
-  wall = new THREE.Mesh(new THREE.BoxGeometry(220, 10, 10), new THREE.MeshPhongMaterial())
-  scene.add(wall)
+	let plane, wall
+  wall = new THREE.Mesh ( new THREE.BoxGeometry (220, 10, 10), new THREE.MeshPhongMaterial() )
+  scene.add (wall)
   wall.position.z = 105
-  plane = new Plane(new THREE.Vector3(0, 0, -5), new THREE.Vector3(0, 0, -1), wall)
+	plane = new Plane (new THREE.Vector3(0,0,-5), new THREE.Vector3(0,0,-1), wall)
   plane.update()
-  planes.push(plane)
+  planes.push (plane)
 
-  wall = new THREE.Mesh(new THREE.BoxGeometry(220, 10, 10), new THREE.MeshPhongMaterial())
-  scene.add(wall)
+  wall = new THREE.Mesh ( new THREE.BoxGeometry (220, 10, 10), new THREE.MeshPhongMaterial() )
+  scene.add (wall)
   wall.position.z = -105
-  plane = new Plane(new THREE.Vector3(0, 0, 5), new THREE.Vector3(0, 0, 1), wall.clone())
+	plane = new Plane (new THREE.Vector3(0,0,5), new THREE.Vector3(0,0,1), wall.clone())
   plane.update()
-  planes.push(plane)
+  planes.push (plane)
 
 
-  wall = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 220), new THREE.MeshPhongMaterial())
-  scene.add(wall)
+ wall = new THREE.Mesh ( new THREE.BoxGeometry (10, 10, 220), new THREE.MeshPhongMaterial() )
+  scene.add (wall)
   wall.position.x = 105
-  plane = new Plane(new THREE.Vector3(-5, 0, 0), new THREE.Vector3(-1, 0, 0), wall)
+	plane = new Plane (new THREE.Vector3(-5,0,0), new THREE.Vector3(-1,0,0), wall)
   plane.update()
-  planes.push(plane)
+  planes.push (plane)
 
-  wall = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 220), new THREE.MeshPhongMaterial())
-  scene.add(wall)
+ wall = new THREE.Mesh ( new THREE.BoxGeometry (10, 10, 220), new THREE.MeshPhongMaterial() )
+  scene.add (wall)
   wall.position.x = -105
-  plane = new Plane(new THREE.Vector3(5, 0, 0), new THREE.Vector3(1, 0, 0), wall.clone())
+	plane = new Plane (new THREE.Vector3(5,0,0), new THREE.Vector3(1,0,0), wall.clone())
   plane.update()
-  planes.push(plane)
+  planes.push (plane)
 }
 
-
+ 
 
 function animate() {
 
-  balls.forEach(function(b) {
-    b.update(0.1)
-  })
-  //	ball.update (0.1)
-
+	balls.forEach (function(b) {b.update(0.1)})
+//	ball.update (0.1)
+	
   requestAnimationFrame(animate);
   render();
 }
@@ -196,6 +212,11 @@ function render() {
   renderer.render(scene, camera);
 }
 
+
+
 </script>
-    </body>
+
+</body>
 </html>
+
+
